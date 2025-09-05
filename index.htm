@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Web Event Handled on iOS Page Timeout</title>
+  <style>
+    body {
+      font-family: -apple-system, sans-serif;
+      padding: 2em;
+      background-color: #f8f8f8;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 0.5em;
+    }
+    #timer {
+      font-size: 20px;
+      margin-top: 1em;
+      color: #007AFF;
+    }
+    button {
+      margin-top: 2em;
+      padding: 1em;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>iOS WebView Event Demo</h1>
+  <p>This page will send an event to the native iOS app after <strong>5 seconds</strong>.</p>
+
+  <div id="timer">Time left: 5 seconds</div>
+
+  <button onclick="sendManualEvent()">Send Manual Event to iOS</button>
+
+  <script>
+    let secondsLeft = 5;
+    const timerDisplay = document.getElementById("timer");
+    const HANDLER = "performiOSAppEvent";
+
+    const countdown = setInterval(() => {
+      secondsLeft--;
+      timerDisplay.innerText = `Time left: ${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}`;
+      if (secondsLeft <= 0) {
+        clearInterval(countdown);
+        sendAutoEvent();
+      }
+    }, 1000);
+
+    function sendAutoEvent() {
+      if (window.webkit && window.webkit.messageHandlers[HANDLER]) {
+        window.webkit.messageHandlers[HANDLER].postMessage({
+          action: "goHome",
+          message: "Auto-triggered after 5 seconds"
+        });
+      } else {
+        console.warn(`${HANDLER} handler not found`);
+      }
+    }
+
+    function sendManualEvent() {
+      if (window.webkit && window.webkit.messageHandlers[HANDLER]) {
+        window.webkit.messageHandlers[HANDLER].postMessage({
+          action: "closeWebView",
+          message: "Manual event triggered by user"
+        });
+      } else {
+        alert(`${HANDLER} handler not available.`);
+      }
+    }
+  </script>
+
+</body>
+</html>
+
